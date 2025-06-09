@@ -25,3 +25,6 @@ dist-ssr
 
 # Personal learning progress
 LEARNING_PATH.md
+
+# Environment variables
+.env
