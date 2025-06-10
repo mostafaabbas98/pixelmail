@@ -20,7 +20,7 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { instance, accounts } = useMsal();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [graphService, setGraphService] = useState<GraphApiService | null>(
     null
@@ -54,6 +54,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const getUserProfile = async () => {
       if (accounts.length > 0) {
         try {
+          setIsLoading(true);
           const graphService = new GraphApiService(instance);
           setGraphService(graphService);
           const userProfile = await graphService.getUserProfile();

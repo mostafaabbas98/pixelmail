@@ -3,11 +3,12 @@ import type { FolderType } from "../services/graphApi";
 import type { EmailMessage } from "../types";
 import { formatTime } from "../utils/formatTime";
 import { EmailSkeleton } from "./EmailSkeleton";
+import { ListFallback } from "./ListFallback";
 
 interface EmailListProps {
   selectedFolder: string;
-  onSelectEmail: (emailId: string) => void;
-  selectedEmailId: string | null;
+  onSelectEmail: (emailId: EmailMessage) => void;
+  selectedEmail: EmailMessage | null;
 }
 
 const getImportanceIcon = (importance: string) => {
@@ -24,49 +25,30 @@ const getImportanceIcon = (importance: string) => {
 export const EmailList = ({
   selectedFolder,
   onSelectEmail,
-  selectedEmailId,
+  selectedEmail,
 }: EmailListProps) => {
   const { emails, loading, error, refetch } = useEmails(
     selectedFolder as FolderType,
     100
   );
 
-  const handleEmailClick = async (emailId: string) => {
-    onSelectEmail?.(emailId);
+  const handleEmailClick = async (email: EmailMessage) => {
+    onSelectEmail?.(email);
   };
 
-  if (loading) {
-    return <EmailSkeleton count={8} />;
-  }
-
-  if (emails.length === 0 || error) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="text-6xl mb-4">📭</div>
-          <p className="text-gray-900 font-medium">No emails found</p>
-          <p className="text-gray-500 text-sm mt-1">Your inbox is empty</p>
-          <button
-            onClick={refetch}
-            className="mt-4 text-blue-600 hover:text-blue-800 text-sm underline"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="p-4 border-b border-gray-200">
+    <div className="flex-1 overflow-y-auto border-r border-gray-200">
+      <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 capitalize">
           {selectedFolder}
         </h2>
       </div>
+      {loading && <EmailSkeleton count={8} />}
+      {error && <ListFallback refetch={refetch} />}
       <div className="divide-y divide-gray-200">
         {emails.map((email: EmailMessage) => {
-          const isSelected = selectedEmailId === email?.conversationId;
+          const isSelected =
+            selectedEmail?.conversationId === email?.conversationId;
           const isUnread = !email.isRead;
 
           const timeFormatted = formatTime(email.receivedDateTime);
@@ -74,7 +56,7 @@ export const EmailList = ({
           return (
             <div
               key={email.id}
-              onClick={() => handleEmailClick(email?.conversationId)}
+              onClick={() => handleEmailClick(email)}
               className={`
                 relative p-4  cursor-pointer transition-all duration-200
                 ${isSelected ? "bg-blue-200/20" : "hover:bg-gray-50"}

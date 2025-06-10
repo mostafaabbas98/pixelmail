@@ -1,21 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { EmailList } from "./EmailList";
 import { EmailView } from "./EmailView";
+import { useUrlParams } from "../hooks/useUrlParams";
+import type { EmailMessage } from "../types/email";
 
-type Folder = "inbox" | "sent" | "drafts" | "archive" | "trash";
+type Folder = "inbox" | "spam" | "sent" | "drafts" | "archive" | "trash";
 
 export const EmailApp = () => {
+  const { params, updateParams, removeParam } = useUrlParams();
   const [selectedFolder, setSelectedFolder] = useState<Folder>("inbox");
-  const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+  const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
+
+  useEffect(() => {
+    const folder = params.get("folder") as Folder;
+
+    if (
+      folder &&
+      ["inbox", "spam", "sent", "drafts", "archive", "trash"].includes(folder)
+    ) {
+      setSelectedFolder(folder);
+    }
+  }, [params]);
 
   const handleSelectFolder = (folder: Folder) => {
     setSelectedFolder(folder);
-    setSelectedEmailId(null);
+    setSelectedEmail(null);
+    updateParams("folder", folder);
+    removeParam("email");
   };
 
-  const handleSelectEmail = (emailId: string) => {
-    setSelectedEmailId(emailId);
+  const handleSelectEmail = (email: EmailMessage) => {
+    setSelectedEmail(email);
   };
 
   return (
@@ -28,10 +44,10 @@ export const EmailApp = () => {
       />
       <EmailList
         selectedFolder={selectedFolder}
-        selectedEmailId={selectedEmailId}
+        selectedEmail={selectedEmail}
         onSelectEmail={handleSelectEmail}
       />
-      <EmailView selectedEmailId={selectedEmailId || null} />
+      <EmailView selectedEmail={selectedEmail} />
     </div>
   );
 };

@@ -17,7 +17,7 @@ function App() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoading) {
     return <LandingPage />;
   }
 

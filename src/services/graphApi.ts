@@ -6,6 +6,7 @@ import { loginRequest } from "../config/authConfig";
 const FOLDER_ENDPOINTS = {
   inbox: "/me/messages",
   sent: "/me/mailFolders/SentItems/messages",
+  spam: "/me/mailFolders/JunkEmail/messages",
   drafts: "/me/mailFolders/Drafts/messages",
   trash: "/me/mailFolders/DeletedItems/messages",
   archive: "/me/mailFolders/Archive/messages",

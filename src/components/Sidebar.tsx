@@ -23,6 +23,16 @@ export const Sidebar = ({
             📥 Inbox
           </button>
           <button
+            onClick={() => setSelectedFolder("spam")}
+            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              selectedFolder === "spam"
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            }`}
+          >
+            📥 Spam
+          </button>
+          <button
             onClick={() => setSelectedFolder("sent")}
             className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               selectedFolder === "sent"
