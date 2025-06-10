@@ -1,12 +1,16 @@
 export interface UserProfile {
   id: string;
-  displayName: string;
-  mail: string;
-  userPrincipalName: string;
+  name: string;
+  email: string;
   givenName?: string;
   surname?: string;
   jobTitle?: string;
+  userPrincipalName?: string;
+  mail?: string;
   officeLocation?: string;
-  businessPhones: string[];
+  department?: string;
   mobilePhone?: string;
+  businessPhones?: string[];
+  displayName?: string;
+  userType?: string;
 }
