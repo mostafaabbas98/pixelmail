@@ -3,6 +3,16 @@ import type { EmailListResponse, GraphApiError } from "../types";
 import type { UserResponse } from "../types";
 import { loginRequest } from "../config/authConfig";
 
+const FOLDER_ENDPOINTS = {
+  inbox: "/me/messages",
+  sent: "/me/mailFolders/SentItems/messages",
+  drafts: "/me/mailFolders/Drafts/messages",
+  trash: "/me/mailFolders/DeletedItems/messages",
+  archive: "/me/mailFolders/Archive/messages",
+} as const;
+
+export type FolderType = keyof typeof FOLDER_ENDPOINTS;
+
 export class GraphApiService {
   private msalInstance: IPublicClientApplication;
   private readonly baseUrl = "https://graph.microsoft.com/v1.0";
@@ -29,7 +39,6 @@ export class GraphApiService {
       const res = await this.msalInstance.acquireTokenPopup(loginRequest);
       return res.accessToken;
     }
-
   }
 
   private async makeRequest<T>(endpoint: string): Promise<T> {
@@ -39,7 +48,7 @@ export class GraphApiService {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
-        }
+        },
       });
 
       if (!res.ok) {
@@ -49,7 +58,7 @@ export class GraphApiService {
 
       return await res.json();
     } catch (error) {
-      console.error('Graph API request failed:', error);
+      console.error("Graph API request failed:", error);
       throw error;
     }
   }
@@ -58,7 +67,10 @@ export class GraphApiService {
     return this.makeRequest<UserResponse>("/me");
   }
 
-  async getEmails(top: number = 25) {
-    return this.makeRequest<EmailListResponse>(`/me/messages?$top=${top}&$orderby=receivedDateTime desc`);
+  async getEmailsByFolder(folder: FolderType, top: number = 25) {
+    const endpoint = FOLDER_ENDPOINTS[folder];
+    return this.makeRequest<EmailListResponse>(
+      `${endpoint}?$top=${top}&$orderby=receivedDateTime desc`
+    );
   }
 }

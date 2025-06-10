@@ -22,6 +22,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [graphService, setGraphService] = useState<GraphApiService | null>(
+    null
+  );
 
   const login = async () => {
     try {
@@ -52,6 +55,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       if (accounts.length > 0) {
         try {
           const graphService = new GraphApiService(instance);
+          setGraphService(graphService);
           const userProfile = await graphService.getUserProfile();
 
           setUser({
@@ -88,6 +92,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     logout,
     clearError,
+    graphService,
   };
 
   return (

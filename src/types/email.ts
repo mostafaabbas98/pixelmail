@@ -1,5 +1,6 @@
 export interface EmailMessage {
   id: string;
+  conversationId: string;
   subject: string;
   bodyPreview: string;
   body: {
@@ -21,8 +22,8 @@ export interface EmailMessage {
   receivedDateTime: string;
   isRead: boolean;
   hasAttachments: boolean;
-  importance: 'low' | 'normal' | 'high';
+  importance: "low" | "normal" | "high";
   flag: {
-    flagStatus: 'notFlagged' | 'complete' | 'flagged';
+    flagStatus: "notFlagged" | "complete" | "flagged";
   };
 }
