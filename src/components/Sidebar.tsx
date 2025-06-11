@@ -8,7 +8,7 @@ export const Sidebar = ({
   setSelectedFolder,
 }: SidebarProps) => {
   return (
-    <div className="w-2/12 bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-20 md:w-2/12 lg:w-2/12 bg-white border-r border-gray-200 flex flex-col">
       {/* Navigation Menu */}
       <nav className="flex-1 p-2">
         <div className="space-y-1">

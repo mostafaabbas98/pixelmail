@@ -7,6 +7,12 @@ export interface EmailMessage {
     contentType: string;
     content: string;
   };
+  sender: {
+    emailAddress: {
+      address: string;
+      name: string;
+    };
+  };
   from: {
     emailAddress: {
       address: string;
@@ -20,7 +26,9 @@ export interface EmailMessage {
     };
   }>;
   receivedDateTime: string;
+  sentDateTime: string;
   isRead: boolean;
+  isDraft: boolean;
   hasAttachments: boolean;
   importance: "low" | "normal" | "high";
   flag: {

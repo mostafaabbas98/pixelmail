@@ -7,7 +7,6 @@ export const AppHeader = () => {
   const popoverRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Close popover when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -31,16 +30,13 @@ export const AppHeader = () => {
 
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
-      {/* Left: App branding */}
       <div className="flex items-center space-x-4">
         <h1 className="text-xl font-bold text-gray-900">📧 PixelMail</h1>
       </div>
 
-      {/* Right: User avatar button */}
       <div className="relative">
         {user && (
           <>
-            {/* User avatar button */}
             <button
               ref={buttonRef}
               onClick={() => setShowPopover(!showPopover)}
@@ -51,13 +47,11 @@ export const AppHeader = () => {
               </span>
             </button>
 
-            {/* Popover */}
             {showPopover && (
               <div
                 ref={popoverRef}
                 className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
               >
-                {/* User info section */}
                 <div className="p-4 border-b border-gray-200">
                   <div className="flex items-center space-x-3">
                     <div className="h-12 w-12 bg-blue-500 rounded-full flex items-center justify-center">
@@ -83,12 +77,11 @@ export const AppHeader = () => {
                   </div>
                 </div>
 
-                {/* Actions section */}
                 <div className="p-2">
                   <button
                     onClick={handleLogout}
                     disabled={isLoading}
-                    className="w-full text-left px-3 py-2 text-sm border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 text-sm text-white bg-red-500 hover:bg-red-600 rounded-md text-center"
                   >
                     Sign out
                   </button>
