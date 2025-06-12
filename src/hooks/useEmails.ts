@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { EmailListResponse } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import type { FolderType } from "../services/graphApi";
+import type { EmailMessage } from "../types/email";
 
 export const useEmails = (folder: FolderType, count: number = 25) => {
   const { graphService, isAuthenticated } = useAuth();
@@ -24,6 +25,35 @@ export const useEmails = (folder: FolderType, count: number = 25) => {
     }
   };
 
+  const updateEmailOptimistically = (
+    emailId: string,
+    updates: Partial<EmailMessage>
+  ) => {
+    setEmails((prevEmails) => {
+      if (!prevEmails) return prevEmails;
+
+      return {
+        ...prevEmails,
+        value: prevEmails.value.map((email) =>
+          email.id === emailId ? { ...email, ...updates } : email
+        ),
+      };
+    });
+  };
+
+  const revertEmailUpdate = (emailId: string, originalEmail: EmailMessage) => {
+    setEmails((prevEmails) => {
+      if (!prevEmails) return prevEmails;
+
+      return {
+        ...prevEmails,
+        value: prevEmails.value.map((email) =>
+          email.id === emailId ? originalEmail : email
+        ),
+      };
+    });
+  };
+
   useEffect(() => {
     fetchEmails();
   }, [isAuthenticated, graphService, folder, count]);
@@ -34,5 +64,7 @@ export const useEmails = (folder: FolderType, count: number = 25) => {
     error,
     refetch: fetchEmails,
     hasNextPage: !!emails?.["@odata.nextLink"],
+    updateEmailOptimistically,
+    revertEmailUpdate,
   };
 };

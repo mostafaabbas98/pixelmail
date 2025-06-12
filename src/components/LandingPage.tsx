@@ -6,7 +6,6 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8 p-8">
-        {/* Logo/Brand */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             📧 PixelMail
@@ -16,7 +15,6 @@ export const LandingPage = () => {
           </p>
         </div>
 
-        {/* Features */}
         <div className="space-y-4">
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <h3 className="font-semibold text-gray-900 mb-2">
@@ -31,7 +29,6 @@ export const LandingPage = () => {
           </div>
         </div>
 
-        {/* Login Section */}
         <div className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">

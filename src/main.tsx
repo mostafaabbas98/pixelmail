@@ -7,7 +7,6 @@ import AuthProvider from "./contexts/AuthContext.tsx";
 import App from "./App.tsx";
 import "./index.css";
 
-// Create MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
 
 createRoot(document.getElementById("root")!).render(

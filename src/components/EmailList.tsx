@@ -1,4 +1,5 @@
 import { useEmails } from "../hooks/useEmails";
+import { useToogleRead } from "../hooks/useToogleRead";
 import type { FolderType } from "../services/graphApi";
 import type { EmailMessage } from "../types";
 import { formatTime } from "../utils/formatTime";
@@ -27,13 +28,24 @@ export const EmailList = ({
   onSelectEmail,
   selectedEmail,
 }: EmailListProps) => {
-  const { emails, loading, error, refetch } = useEmails(
-    selectedFolder as FolderType,
-    100
-  );
+  const {
+    emails,
+    loading,
+    error,
+    refetch,
+    updateEmailOptimistically,
+    revertEmailUpdate,
+  } = useEmails(selectedFolder as FolderType, 100);
+  const { toggleRead } = useToogleRead({
+    updateEmailOptimistically,
+    revertEmailUpdate,
+  });
 
   const handleEmailClick = async (email: EmailMessage) => {
     onSelectEmail?.(email);
+    if (!email.isRead) {
+      toggleRead(email.id, !email.isRead, email);
+    }
   };
 
   return (
@@ -49,7 +61,7 @@ export const EmailList = ({
         {emails.map((email: EmailMessage) => {
           const isSelected =
             selectedEmail?.conversationId === email?.conversationId;
-          const isUnread = !email.isRead;
+          const isRead = email.isRead;
 
           const timeFormatted = formatTime(email.receivedDateTime);
 
@@ -59,22 +71,23 @@ export const EmailList = ({
               onClick={() => handleEmailClick(email)}
               className={`
                 relative p-4  cursor-pointer transition-all duration-200
-                ${isSelected ? "bg-blue-200/20" : "hover:bg-gray-50"}
-                ${isUnread ? "bg-white" : "bg-gray-50/50"}
+                ${
+                  isSelected
+                    ? "bg-blue-200/20"
+                    : " bg-gray-50/50 hover:bg-gray-50"
+                }
               `}
             >
-              {/* Unread indicator */}
-              {isUnread && (
+              {!isRead && (
                 <div className="absolute left-0 top-0 transform  w-1 h-full bg-blue-600 rounded-r"></div>
               )}
 
               <div className="flex items-start space-x-3 ml-2">
-                {/* Sender Avatar */}
                 <div className="flex-shrink-0">
                   <div
                     className={`
                     h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium uppercase
-                    ${isUnread ? "bg-blue-600" : "bg-gray-400"}
+                    ${isRead ? "bg-blue-600" : "bg-gray-400"}
                   `}
                   >
                     {email.from?.emailAddress?.name?.charAt(0) ||
@@ -83,16 +96,14 @@ export const EmailList = ({
                   </div>
                 </div>
 
-                {/* Email Content */}
                 <div className="flex-1 min-w-0">
-                  {/* Header: Sender, Time, and Importance */}
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center space-x-2 flex-1 min-w-0">
                       <p
                         className={`
                         text-sm truncate
                         ${
-                          isUnread
+                          isRead
                             ? "font-semibold text-gray-900"
                             : "font-medium text-gray-700"
                         }
@@ -116,12 +127,11 @@ export const EmailList = ({
                     </p>
                   </div>
 
-                  {/* Subject */}
                   <p
                     className={`
                     text-sm truncate mb-1
                     ${
-                      isUnread
+                      isRead
                         ? "font-semibold text-gray-900"
                         : "font-normal text-gray-800"
                     }
@@ -130,15 +140,12 @@ export const EmailList = ({
                     {email.subject || "(No Subject)"}
                   </p>
 
-                  {/* Body Preview */}
                   <p className="text-sm text-gray-600 truncate mb-2 leading-relaxed">
                     {email.bodyPreview || "No preview available"}
                   </p>
 
-                  {/* Status Indicators */}
                   <div className="flex items-center space-x-3">
-                    {/* Unread dot */}
-                    {isUnread && (
+                    {!isRead && (
                       <div className="flex items-center space-x-1">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                         <span className="text-xs text-blue-600 font-medium">
@@ -147,7 +154,6 @@ export const EmailList = ({
                       </div>
                     )}
 
-                    {/* Attachments */}
                     {email.hasAttachments && (
                       <div className="flex items-center space-x-1">
                         <span className="text-gray-500">📎</span>
@@ -157,7 +163,6 @@ export const EmailList = ({
                       </div>
                     )}
 
-                    {/* Flag */}
                     {email.flag?.flagStatus === "flagged" && (
                       <div className="flex items-center space-x-1">
                         <span className="text-red-500">🚩</span>
@@ -165,7 +170,6 @@ export const EmailList = ({
                       </div>
                     )}
 
-                    {/* Complete flag */}
                     {email.flag?.flagStatus === "complete" && (
                       <div className="flex items-center space-x-1">
                         <span className="text-green-500">✅</span>

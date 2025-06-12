@@ -68,6 +68,24 @@ export class GraphApiService {
     }
   }
 
+  private async patchRequest<T>(endpoint: string, body: any): Promise<T> {
+    const accessToken = await this.getAccessToken();
+    const res = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const error: GraphApiError = await res.json();
+      throw new Error(`Graph API error: ${error.error.message}`);
+    }
+    return await res.json();
+  }
+
   async getUserProfile(): Promise<UserResponse> {
     return this.makeRequest<UserResponse>("/me");
   }
@@ -83,5 +101,11 @@ export class GraphApiService {
     return this.makeRequest<AttachmentResponse>(
       `/me/messages/${emailId}/attachments`
     );
+  }
+
+  async toggleRead(emailId: string, isRead: boolean) {
+    return this.patchRequest<EmailListResponse>(`/me/messages/${emailId}`, {
+      isRead: isRead,
+    });
   }
 }

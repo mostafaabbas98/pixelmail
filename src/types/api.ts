@@ -6,7 +6,6 @@ export interface GraphApiResponse<T> {
   value: T[];
 }
 
-// Specific response types
 export type EmailListResponse = GraphApiResponse<
   import("./email").EmailMessage
 >;
@@ -29,7 +28,6 @@ export interface UserResponse {
   mobilePhone?: string;
 }
 
-// Error response
 export interface GraphApiError {
   error: {
     code: string;
