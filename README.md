@@ -54,10 +54,10 @@ npm run lint
 Currently in active development. Core features being implemented:
 
 - ✅ Project setup and basic layout
-- 🔄 Microsoft Graph API integration
-- ⏳ Email authentication flow
-- ⏳ Email list and reading interface
-- ⏳ Compose and send functionality
+- ✅ Microsoft Graph API integration
+- ✅ Email authentication flow
+- ✅ Email list and reading interface
+- ⚠️ Compose and send functionality
 - ⏳ Pixel art theme and animations
 
 ## 🤝 Contributing
