@@ -1,5 +1,9 @@
 import type { IPublicClientApplication } from "@azure/msal-browser";
-import type { EmailListResponse, GraphApiError } from "../types";
+import type {
+  AttachmentResponse,
+  EmailListResponse,
+  GraphApiError,
+} from "../types";
 import type { UserResponse } from "../types";
 import { loginRequest } from "../config/authConfig";
 
@@ -72,6 +76,12 @@ export class GraphApiService {
     const endpoint = FOLDER_ENDPOINTS[folder];
     return this.makeRequest<EmailListResponse>(
       `${endpoint}?$top=${top}&$orderby=receivedDateTime desc`
+    );
+  }
+
+  async getAttachments(emailId: string) {
+    return this.makeRequest<AttachmentResponse>(
+      `/me/messages/${emailId}/attachments`
     );
   }
 }

@@ -2,13 +2,13 @@ import dayjs from "dayjs";
 import type { EmailMessage } from "../types/email";
 import { useMemo } from "react";
 import DOMPurify from "dompurify";
+import EmailAttachments from "./EmailAttachments";
 
 export const EmailView = ({
   selectedEmail,
 }: {
   selectedEmail: EmailMessage | null;
 }) => {
-  console.log(selectedEmail);
   const sanitizer = useMemo(() => {
     return DOMPurify.sanitize(selectedEmail?.body?.content || "");
   }, [selectedEmail]);
@@ -44,11 +44,16 @@ export const EmailView = ({
             </div>
           </div>
 
-          <div
-            dangerouslySetInnerHTML={{
-              __html: sanitizer,
-            }}
-          />
+          <div>
+            {selectedEmail?.hasAttachments && (
+              <EmailAttachments emailId={selectedEmail.id} />
+            )}
+            <div
+              dangerouslySetInnerHTML={{
+                __html: sanitizer,
+              }}
+            />
+          </div>
         </>
       )}
     </div>
