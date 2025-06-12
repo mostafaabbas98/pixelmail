@@ -41,7 +41,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         account: accounts[0],
       });
       instance.logoutRedirect({
-        postLogoutRedirectUri: "/",
+        authority: "/",
       });
     }
   };
