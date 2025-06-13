@@ -1,69 +1,91 @@
-import { useEffect, useState } from "react";
-import type { EmailListResponse } from "../types";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import type { FolderType } from "../services/graphApi";
 import type { EmailMessage } from "../types/email";
 
-export const useEmails = (folder: FolderType, count: number = 25) => {
+export const useEmails = (folder: FolderType, pageSize: number = 25) => {
   const { graphService, isAuthenticated } = useAuth();
-  const [emails, setEmails] = useState<EmailListResponse | null>(null);
+  const [emails, setEmails] = useState<EmailMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasNextPage, setHasNextPage] = useState(true);
 
-  const fetchEmails = async () => {
+  const fetchEmails = async (reset: boolean = false) => {
     if (!isAuthenticated || !graphService) return;
 
-    setLoading(true);
+    const currentSkip = reset ? 0 : emails.length;
+
+    if (reset) {
+      setLoading(true);
+      setEmails([]);
+      setHasNextPage(true);
+    } else {
+      setLoadingMore(true);
+    }
+
     setError(null);
+
     try {
-      const emailsDate = await graphService.getEmailsByFolder(folder, count);
-      setEmails(emailsDate);
+      const emailsData = await graphService.getEmailsByFolder(
+        folder,
+        pageSize,
+        currentSkip
+      );
+
+      setEmails((prevEmails) =>
+        reset ? emailsData.value : [...prevEmails, ...emailsData.value]
+      );
+
+      // If we got fewer emails than requested, we've reached the end
+      setHasNextPage(emailsData.value.length === pageSize);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
+
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasNextPage) {
+      fetchEmails(false);
+    }
+  }, [loadingMore, hasNextPage, emails.length]);
+
+  const refetch = useCallback(() => {
+    fetchEmails(true);
+  }, [folder, pageSize]);
 
   const updateEmailOptimistically = (
     emailId: string,
     updates: Partial<EmailMessage>
   ) => {
-    setEmails((prevEmails) => {
-      if (!prevEmails) return prevEmails;
-
-      return {
-        ...prevEmails,
-        value: prevEmails.value.map((email) =>
-          email.id === emailId ? { ...email, ...updates } : email
-        ),
-      };
-    });
+    setEmails((prevEmails) =>
+      prevEmails.map((email) =>
+        email.id === emailId ? { ...email, ...updates } : email
+      )
+    );
   };
 
   const revertEmailUpdate = (emailId: string, originalEmail: EmailMessage) => {
-    setEmails((prevEmails) => {
-      if (!prevEmails) return prevEmails;
-
-      return {
-        ...prevEmails,
-        value: prevEmails.value.map((email) =>
-          email.id === emailId ? originalEmail : email
-        ),
-      };
-    });
+    setEmails((prevEmails) =>
+      prevEmails.map((email) => (email.id === emailId ? originalEmail : email))
+    );
   };
 
   useEffect(() => {
-    fetchEmails();
-  }, [isAuthenticated, graphService, folder, count]);
+    fetchEmails(true);
+  }, [isAuthenticated, graphService, folder]);
 
   return {
-    emails: emails?.value || [],
+    emails,
     loading,
+    loadingMore,
     error,
-    refetch: fetchEmails,
-    hasNextPage: !!emails?.["@odata.nextLink"],
+    hasNextPage,
+    loadMore,
+    refetch,
     updateEmailOptimistically,
     revertEmailUpdate,
   };

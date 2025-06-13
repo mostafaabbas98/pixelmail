@@ -68,7 +68,10 @@ export class GraphApiService {
     }
   }
 
-  private async patchRequest<T>(endpoint: string, body: any): Promise<T> {
+  private async patchRequest<T>(
+    endpoint: string,
+    body: Record<string, unknown>
+  ): Promise<T> {
     const accessToken = await this.getAccessToken();
     const res = await fetch(`${this.baseUrl}${endpoint}`, {
       method: "PATCH",
@@ -90,10 +93,14 @@ export class GraphApiService {
     return this.makeRequest<UserResponse>("/me");
   }
 
-  async getEmailsByFolder(folder: FolderType, top: number = 25) {
+  async getEmailsByFolder(
+    folder: FolderType,
+    top: number = 25,
+    skip: number = 0
+  ) {
     const endpoint = FOLDER_ENDPOINTS[folder];
     return this.makeRequest<EmailListResponse>(
-      `${endpoint}?$top=${top}&$orderby=receivedDateTime desc`
+      `${endpoint}?$top=${top}&$skip=${skip}&$orderby=receivedDateTime desc`
     );
   }
 

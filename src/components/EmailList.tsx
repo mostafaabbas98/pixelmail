@@ -1,5 +1,6 @@
 import { useEmails } from "../hooks/useEmails";
 import { useToogleRead } from "../hooks/useToogleRead";
+import useInfiniteScroll from "../hooks/useInfiniteScroll";
 import type { FolderType } from "../services/graphApi";
 import type { EmailMessage } from "../types";
 import { formatTime } from "../utils/formatTime";
@@ -31,14 +32,23 @@ export const EmailList = ({
   const {
     emails,
     loading,
+    loadingMore,
     error,
+    hasNextPage,
+    loadMore,
     refetch,
     updateEmailOptimistically,
     revertEmailUpdate,
-  } = useEmails(selectedFolder as FolderType, 100);
+  } = useEmails(selectedFolder as FolderType, 20);
   const { toggleRead } = useToogleRead({
     updateEmailOptimistically,
     revertEmailUpdate,
+  });
+
+  const [sentinelRef, { rootRef }] = useInfiniteScroll({
+    loading: loadingMore,
+    hasNextPage,
+    onLoadMore: loadMore,
   });
 
   const handleEmailClick = async (email: EmailMessage) => {
@@ -49,27 +59,34 @@ export const EmailList = ({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto border-r border-gray-200">
-      <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10 shadow-sm">
+    <div
+      className="flex-1 flex flex-col overflow-y-auto border-r border-gray-200"
+      ref={rootRef}
+    >
+      <div className="p-4 border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm flex items-center gap-1">
         <h2 className="text-lg font-semibold text-gray-900 capitalize">
           {selectedFolder}
         </h2>
+        {emails.length > 0 && (
+          <span className="text-sm text-gray-500">({emails.length})</span>
+        )}
       </div>
       {loading && <EmailSkeleton count={8} />}
       {error && <ListFallback refetch={refetch} />}
-      <div className="divide-y divide-gray-200">
-        {emails.map((email: EmailMessage) => {
-          const isSelected =
-            selectedEmail?.conversationId === email?.conversationId;
-          const isRead = email.isRead;
+      {!loading && !error && (
+        <div>
+          <div className="divide-y divide-gray-200 min-h-screen">
+            {emails.map((email: EmailMessage) => {
+              const isSelected =
+                selectedEmail?.conversationId === email?.conversationId;
+              const isRead = email.isRead;
+              const timeFormatted = formatTime(email.receivedDateTime);
 
-          const timeFormatted = formatTime(email.receivedDateTime);
-
-          return (
-            <div
-              key={email.id}
-              onClick={() => handleEmailClick(email)}
-              className={`
+              return (
+                <div
+                  key={email.id}
+                  onClick={() => handleEmailClick(email)}
+                  className={`
                 relative p-4  cursor-pointer transition-all duration-200
                 ${
                   isSelected
@@ -77,30 +94,30 @@ export const EmailList = ({
                     : " bg-gray-50/50 hover:bg-gray-50"
                 }
               `}
-            >
-              {!isRead && (
-                <div className="absolute left-0 top-0 transform  w-1 h-full bg-blue-600 rounded-r"></div>
-              )}
+                >
+                  {!isRead && (
+                    <div className="absolute left-0 top-0 transform  w-1 h-full bg-blue-600 rounded-r"></div>
+                  )}
 
-              <div className="flex items-start space-x-3 ml-2">
-                <div className="flex-shrink-0">
-                  <div
-                    className={`
+                  <div className="flex items-start space-x-3 ml-2">
+                    <div className="flex-shrink-0">
+                      <div
+                        className={`
                     h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium uppercase
                     ${isRead ? "bg-blue-600" : "bg-gray-400"}
                   `}
-                  >
-                    {email.from?.emailAddress?.name?.charAt(0) ||
-                      email.from?.emailAddress?.address?.charAt(0) ||
-                      "?"}
-                  </div>
-                </div>
+                      >
+                        {email.from?.emailAddress?.name?.charAt(0) ||
+                          email.from?.emailAddress?.address?.charAt(0) ||
+                          "?"}
+                      </div>
+                    </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center space-x-2 flex-1 min-w-0">
-                      <p
-                        className={`
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center space-x-2 flex-1 min-w-0">
+                          <p
+                            className={`
                         text-sm truncate
                         ${
                           isRead
@@ -108,27 +125,27 @@ export const EmailList = ({
                             : "font-medium text-gray-700"
                         }
                       `}
-                      >
-                        {email.from?.emailAddress?.name ||
-                          email.from?.emailAddress?.address ||
-                          "Unknown Sender"}
-                      </p>
-                      {getImportanceIcon(email.importance) && (
-                        <span className="flex-shrink-0">
-                          {getImportanceIcon(email.importance)}
-                        </span>
-                      )}
-                    </div>
-                    <p
-                      className="text-xs text-gray-500 flex-shrink-0 ml-2"
-                      title={timeFormatted.tooltip}
-                    >
-                      {timeFormatted.display}
-                    </p>
-                  </div>
+                          >
+                            {email.from?.emailAddress?.name ||
+                              email.from?.emailAddress?.address ||
+                              "Unknown Sender"}
+                          </p>
+                          {getImportanceIcon(email.importance) && (
+                            <span className="flex-shrink-0">
+                              {getImportanceIcon(email.importance)}
+                            </span>
+                          )}
+                        </div>
+                        <p
+                          className="text-xs text-gray-500 flex-shrink-0 ml-2"
+                          title={timeFormatted.tooltip}
+                        >
+                          {timeFormatted.display}
+                        </p>
+                      </div>
 
-                  <p
-                    className={`
+                      <p
+                        className={`
                     text-sm truncate mb-1
                     ${
                       isRead
@@ -136,53 +153,63 @@ export const EmailList = ({
                         : "font-normal text-gray-800"
                     }
                   `}
-                  >
-                    {email.subject || "(No Subject)"}
-                  </p>
+                      >
+                        {email.subject || "(No Subject)"}
+                      </p>
 
-                  <p className="text-sm text-gray-600 truncate mb-2 leading-relaxed">
-                    {email.bodyPreview || "No preview available"}
-                  </p>
+                      <p className="text-sm text-gray-600 truncate mb-2 leading-relaxed">
+                        {email.bodyPreview || "No preview available"}
+                      </p>
 
-                  <div className="flex items-center space-x-3">
-                    {!isRead && (
-                      <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        <span className="text-xs text-blue-600 font-medium">
-                          Unread
-                        </span>
+                      <div className="flex items-center space-x-3">
+                        {email.hasAttachments && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-gray-500">📎</span>
+                            <span className="text-xs text-gray-500">
+                              Attachment
+                            </span>
+                          </div>
+                        )}
+
+                        {email.flag?.flagStatus === "flagged" && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-red-500">🚩</span>
+                            <span className="text-xs text-red-500">
+                              Flagged
+                            </span>
+                          </div>
+                        )}
+
+                        {email.flag?.flagStatus === "complete" && (
+                          <div className="flex items-center space-x-1">
+                            <span className="text-green-500">✅</span>
+                            <span className="text-xs text-green-500">
+                              Complete
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-
-                    {email.hasAttachments && (
-                      <div className="flex items-center space-x-1">
-                        <span className="text-gray-500">📎</span>
-                        <span className="text-xs text-gray-500">
-                          Attachment
-                        </span>
-                      </div>
-                    )}
-
-                    {email.flag?.flagStatus === "flagged" && (
-                      <div className="flex items-center space-x-1">
-                        <span className="text-red-500">🚩</span>
-                        <span className="text-xs text-red-500">Flagged</span>
-                      </div>
-                    )}
-
-                    {email.flag?.flagStatus === "complete" && (
-                      <div className="flex items-center space-x-1">
-                        <span className="text-green-500">✅</span>
-                        <span className="text-xs text-green-500">Complete</span>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              );
+            })}
+          </div>
+
+          {hasNextPage && (
+            <div
+              ref={sentinelRef}
+              className="h-20 flex items-center justify-center"
+            >
+              {loadingMore && (
+                <div className="text-sm text-gray-500">
+                  Loading more emails...
+                </div>
+              )}
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
