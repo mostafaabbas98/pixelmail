@@ -4,24 +4,43 @@ import { useMemo } from "react";
 import DOMPurify from "dompurify";
 import EmailAttachments from "./EmailAttachments";
 
+interface EmailViewProps {
+  selectedEmail: EmailMessage | null;
+  onBack?: () => void;
+  isMobile?: boolean;
+}
+
 export const EmailView = ({
   selectedEmail,
-}: {
-  selectedEmail: EmailMessage | null;
-}) => {
+  onBack,
+  isMobile = false,
+}: EmailViewProps) => {
   const sanitizer = useMemo(() => {
     return DOMPurify.sanitize(selectedEmail?.body?.content || "");
   }, [selectedEmail]);
 
   return (
-    <div className="w-7/12 overflow-y-auto bg-white">
+    <div
+      className={`${
+        isMobile ? "w-full" : "w-7/12"
+      } overflow-y-auto overflow-x-hidden bg-white`}
+    >
       {!selectedEmail ? (
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-gray-500">No email selected</div>
         </div>
       ) : (
-        <>
-          <div className="p-4 border-b border-gray-300 bg-white flex flex-col gap-1 sticky top-0 shadow-md z-50">
+        <div>
+          <div className="p-4 border-b border-gray-300 bg-white flex flex-col gap-1 sticky top-0 shadow-md z-40">
+            {isMobile && onBack && (
+              <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-2 self-start"
+              >
+                <span>←</span>
+                <span>Back</span>
+              </button>
+            )}
             <div className="text-base font-semibold text-gray-800">
               {selectedEmail?.subject || ""}
             </div>
@@ -44,7 +63,7 @@ export const EmailView = ({
             </div>
           </div>
 
-          <div className="w-full h-fit p-4">
+          <div className="w-full h-fit p-4 overflow-x-auto">
             {selectedEmail?.hasAttachments && (
               <EmailAttachments emailId={selectedEmail.id} />
             )}
@@ -54,7 +73,7 @@ export const EmailView = ({
               }}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
