@@ -31,7 +31,14 @@ export const AppHeader = () => {
   return (
     <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6">
       <div className="flex items-center space-x-4">
-        <h1 className="text-xl font-bold text-gray-900">📧 PixelMail</h1>
+        <h1 className="text-xl font-bold text-gray-900 flex items-center">
+          <img
+            src="/icons/pixel-mail.svg"
+            alt="PixelMail"
+            className="w-6 h-6 mr-2"
+          />
+          <span>PixelMail</span>
+        </h1>
       </div>
 
       <div className="relative">
@@ -40,11 +47,9 @@ export const AppHeader = () => {
             <button
               ref={buttonRef}
               onClick={() => setShowPopover(!showPopover)}
-              className="h-9 w-9 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors border-2 border-transparent hover:border-blue-300"
+              className="h-10 w-10 bg-blue-300 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors border-2 border-transparent hover:border-blue-300 p-1"
             >
-              <span className="text-white text-sm font-medium uppercase">
-                {user.displayName?.charAt(0) || user.name?.charAt(0) || "?"}
-              </span>
+              <img src="/icons/user.svg" alt="User" />
             </button>
 
             {showPopover && (

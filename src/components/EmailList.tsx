@@ -100,17 +100,12 @@ export const EmailList = ({
                   )}
 
                   <div className="flex items-start space-x-3 ml-2">
-                    <div className="flex-shrink-0">
-                      <div
-                        className={`
-                    h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium uppercase
-                    ${isRead ? "bg-blue-600" : "bg-gray-400"}
-                  `}
-                      >
-                        {email.from?.emailAddress?.name?.charAt(0) ||
-                          email.from?.emailAddress?.address?.charAt(0) ||
-                          "?"}
-                      </div>
+                    <div className="flex-shrink-0 w-6 h-6">
+                      {isRead ? (
+                        <img src="/icons/open-mail.svg" alt="Read" />
+                      ) : (
+                        <img src="/icons/close-mail.svg" alt="Unread" />
+                      )}
                     </div>
 
                     <div className="flex-1 min-w-0">
