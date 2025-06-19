@@ -17,13 +17,14 @@ export const Sidebar = ({
             <button
               key={folder.name}
               onClick={() => setSelectedFolder(folder.path)}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`w-full flex flex-col lg:flex-row items-center p-2 gap-2 text-sm font-medium rounded-md transition-colors ${
                 selectedFolder === folder.path
                   ? "bg-blue-100 text-blue-600"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              {folder.icon} {folder.name}
+              <img src={folder.icon} alt={folder.name} className="w-4 h-4" />
+              {folder.name}
             </button>
           ))}
         </div>

@@ -13,13 +13,13 @@ export const TopBar = ({ selectedFolder, setSelectedFolder }: TopBarProps) => {
           <button
             key={folder.name}
             onClick={() => setSelectedFolder(folder.path)}
-            className={`flex items-center gap-2 p-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
+            className={`min-w-20 flex items-center gap-2 p-2 text-sm font-medium rounded-md whitespace-nowrap transition-colors ${
               selectedFolder === folder.path
                 ? "bg-blue-100 text-blue-600"
                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             }`}
           >
-            <span>{folder.icon}</span>
+            <img src={folder.icon} alt={folder.name} className="w-4 h-4" />
             <span>{folder.name}</span>
           </button>
         ))}

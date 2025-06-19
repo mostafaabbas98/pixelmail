@@ -2,31 +2,31 @@ export const folders = [
   {
     name: "Inbox",
     path: "inbox",
-    icon: "📥",
+    icon: "/icons/inbox.svg",
   },
   {
     name: "Spam",
     path: "spam",
-    icon: "📥",
+    icon: "/icons/spam.svg",
   },
   {
     name: "Sent",
     path: "sent",
-    icon: "📤",
+    icon: "/icons/send.svg",
   },
   {
     name: "Drafts",
     path: "drafts",
-    icon: "📄",
+    icon: "/icons/draft.svg",
   },
   {
     name: "Archive",
     path: "archive",
-    icon: "📦",
+    icon: "/icons/archive.svg",
   },
   {
     name: "Trash",
     path: "trash",
-    icon: "🗑️",
+    icon: "/icons/trash.svg",
   },
 ];
