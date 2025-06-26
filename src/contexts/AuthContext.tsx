@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
   type ReactNode,
 } from "react";
 import type { AuthContextType, AuthUser } from "../types/auth";
@@ -20,18 +21,26 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { instance, accounts } = useMsal();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [graphService, setGraphService] = useState<GraphApiService | null>(
     null
   );
 
+  const loadingStartRef = useRef<number>(Date.now());
+  const MINIMUM_LOADING_DURATION = 800;
+
   const login = async () => {
     try {
       setError(null);
+      setIsLoading(true);
+      loadingStartRef.current = Date.now();
       await instance.loginPopup(loginRequest);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed!");
+      const elapsed = Date.now() - loadingStartRef.current;
+      const remainingTime = Math.max(0, MINIMUM_LOADING_DURATION - elapsed);
+      setTimeout(() => setIsLoading(false), remainingTime);
     }
   };
 
@@ -46,15 +55,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const clearError = () => {
-    setError(null);
-  };
-
   useEffect(() => {
     const getUserProfile = async () => {
       if (accounts.length > 0) {
         try {
           setIsLoading(true);
+          loadingStartRef.current = Date.now();
           const graphService = new GraphApiService(instance);
           setGraphService(graphService);
           const userProfile = await graphService.getUserProfile();
@@ -74,11 +80,18 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
               : "Failed to load user profile"
           );
         } finally {
-          setIsLoading(false);
+          const elapsed = Date.now() - loadingStartRef.current;
+          const remainingTime = Math.max(0, MINIMUM_LOADING_DURATION - elapsed);
+
+          setTimeout(() => {
+            setIsLoading(false);
+          }, remainingTime);
         }
       } else {
         setUser(null);
-        setIsLoading(false);
+        const elapsed = Date.now() - loadingStartRef.current;
+        const remainingTime = Math.max(0, MINIMUM_LOADING_DURATION - elapsed);
+        setTimeout(() => setIsLoading(false), remainingTime);
       }
     };
 
@@ -92,7 +105,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     error,
     login,
     logout,
-    clearError,
     graphService,
   };
 

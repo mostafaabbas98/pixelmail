@@ -5,31 +5,29 @@ export const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8 p-8">
+      <div className="max-w-lg w-full space-y-8 p-8">
         <div className="text-center">
           <img
-            src="/icons/open-mail.svg"
+            src="/icons/pixel-mail.svg"
             alt="PixelMail"
             className="w-16 h-16 mx-auto mb-4"
           />
           <h1 className="text-4xl font-bold text-gray-900 mb-2">PixelMail</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-lg font-medium">
             A lightweight, fast email client for the modern web
           </p>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h3 className="font-semibold text-gray-900 mb-2">
-              ✨ Why PixelMail?
-            </h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Lightweight - No 2.56GB downloads</li>
-              <li>• Fast - Built with modern React</li>
-              <li>• Clean - Beautiful, distraction-free UI</li>
-              <li>• Secure - OAuth 2.0 with Microsoft</li>
-            </ul>
-          </div>
+          <h3 className="font-semibold text-lg text-gray-900 mb-2">
+            ✨ Why PixelMail?
+          </h3>
+          <ul className="text-md text-gray-600 space-y-1">
+            <li>• Lightweight - No 3 GB downloads</li>
+            <li>• Fast - Built with modern React</li>
+            <li>• Clean - Beautiful, distraction-free UI</li>
+            <li>• Secure - OAuth 2.0 with Microsoft</li>
+          </ul>
         </div>
 
         <div className="space-y-4">
@@ -69,7 +67,7 @@ export const LandingPage = () => {
                 Signing in...
               </>
             ) : (
-              "🚀 Sign in with Microsoft"
+              "Sign in with Microsoft"
             )}
           </button>
 
