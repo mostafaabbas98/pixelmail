@@ -7,9 +7,12 @@ export const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            📧 PixelMail
-          </h1>
+          <img
+            src="/icons/open-mail.svg"
+            alt="PixelMail"
+            className="w-16 h-16 mx-auto mb-4"
+          />
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">PixelMail</h1>
           <p className="text-gray-600">
             A lightweight, fast email client for the modern web
           </p>
